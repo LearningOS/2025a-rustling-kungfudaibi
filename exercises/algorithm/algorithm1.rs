@@ -2,9 +2,9 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
+use std::ptr;
 use std::ptr::NonNull;
 use std::vec::*;
 
@@ -69,14 +69,35 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self where T: Ord
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
+		let mut result = LinkedList::new();
+		let mut a = list_a.start;
+		let mut b = list_b.start;
+		while let (Some(a_ptr), Some(b_ptr)) = (a, b) {
+			unsafe {
+				if (*a_ptr.as_ptr()).val <= (*b_ptr.as_ptr()).val {
+					result.add(std::ptr::read(&(*a_ptr.as_ptr()).val));
+					a = (*a_ptr.as_ptr()).next;
+				} else {
+					result.add(std::ptr::read(&(*b_ptr.as_ptr()).val));
+					b = (*b_ptr.as_ptr()).next;
+				}
+			}
+		}
+		while let Some(a_ptr) = a {
+			unsafe {
+				result.add(std::ptr::read(&(*a_ptr.as_ptr()).val));
+				a = (*a_ptr.as_ptr()).next;
+			}
+		}
+		while let Some(b_ptr) = b {
+			unsafe {
+				result.add(std::ptr::read(&(*b_ptr.as_ptr()).val));
+				b = (*b_ptr.as_ptr()).next;
+			}
+		}
+		result
 	}
 }
 
